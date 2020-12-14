@@ -1,3 +1,5 @@
+import 'package:Giveaway/home.dart';
+import 'package:Giveaway/signup.dart';
 import 'package:flutter/material.dart';
 import 'signin.dart';
 
@@ -10,9 +12,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return new MaterialApp(
       debugShowCheckedModeBanner: false,
-      // routes: <String, WidgetBuilder>{
-      //   '/signup': (BuildContext context) => new SignupPage()
-      // },
+      routes: <String, WidgetBuilder>{
+        '/signin': (BuildContext context) => new SignInScreen(),
+        '/signup': (BuildContext context) => new SignupPage(),
+        '/home': (BuildContext context) => new HomeScreen(),
+      },
       home: new SignInScreen(),
     );
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'Fragments/donateFormFragment.dart';
-import 'Fragments/homeFragment.dart';
-import 'Fragments/profileFragment.dart';
+import 'Fragments/HomeFragment/homeFragment.dart';
+import 'Fragments/DonateFormFragment/donateFormFragment.dart';
+import 'Fragments/ProfileFragment/profileFragment.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 
 class HomeScreen extends StatefulWidget {

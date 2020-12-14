@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'components/validate.dart';
 
 class SignupPage extends StatefulWidget {
   @override
@@ -13,24 +14,6 @@ class SignupScreenState extends State<SignupPage> {
   TextEditingController emailInputController = new TextEditingController();
   TextEditingController pwdInputController = new TextEditingController();
   TextEditingController nameInputController = new TextEditingController();
-  String emailValidator(String value) {
-    Pattern pattern =
-        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
-    RegExp regex = new RegExp(pattern);
-    if (!regex.hasMatch(value)) {
-      return 'Email format is invalid';
-    } else {
-      return null;
-    }
-  }
-
-  String pwdValidator(String value) {
-    if (value.length < 8) {
-      return 'Password must be longer than 8 characters';
-    } else {
-      return null;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +51,20 @@ class SignupScreenState extends State<SignupPage> {
                 key: signupFormKey,
                 child: Column(
                   children: <Widget>[
+                    SizedBox(height: 30.0),
+                    TextFormField(
+                      decoration: InputDecoration(
+                          labelText: 'NAME ',
+                          hintText: 'Razer',
+                          labelStyle: TextStyle(
+                              fontFamily: 'Montserrat',
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey),
+                          focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.green))),
+                      controller: nameInputController,
+                    ),
+                    SizedBox(height: 10.0),
                     TextFormField(
                       decoration: InputDecoration(
                           labelText: 'EMAIL',
@@ -96,31 +93,14 @@ class SignupScreenState extends State<SignupPage> {
                       controller: pwdInputController,
                       validator: pwdValidator,
                     ),
-                    SizedBox(height: 10.0),
-                    TextFormField(
-                      decoration: InputDecoration(
-                          labelText: 'NAME ',
-                          hintText: 'KALAI',
-                          labelStyle: TextStyle(
-                              fontFamily: 'Montserrat',
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey),
-                          focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.green))),
-                      controller: nameInputController,
-                    ),
-                    SizedBox(height: 50.0),
+                    SizedBox(height: 40.0),
                     Container(
-                        height: 40.0,
-                        child: Material(
-                          borderRadius: BorderRadius.circular(20.0),
-                          shadowColor: Colors.greenAccent,
-                          color: Colors.green,
-                          elevation: 7.0,
-                          child: GestureDetector(
-                            onTap: () async {
-                              if (signupFormKey.currentState.validate()) {
-                                await Firebase.initializeApp();
+                      height: 40.0,
+                      child: GestureDetector(
+                          onTap: () async {
+                            if (signupFormKey.currentState.validate()) {
+                              await Firebase.initializeApp();
+                              try {
                                 UserCredential user = await FirebaseAuth
                                     .instance
                                     .createUserWithEmailAndPassword(
@@ -136,11 +116,24 @@ class SignupScreenState extends State<SignupPage> {
                                   'Password': pwdInputController.hashCode,
                                   'Name': nameInputController.text
                                 }).then((value) {
-                                  Navigator.of(context).pushNamed('/donor');
+                                  Navigator.of(context).pop();
+                                  Navigator.of(context)
+                                      .pushReplacementNamed('/home');
                                 }).catchError((err) =>
                                         print("Failed to add user: $err"));
+                              } on FirebaseAuthException catch (e) {
+                                if (e.code == 'email-already-in-use')
+                                  print("SignUp : Email already In use");
+                              } catch (e) {
+                                print("SignUp : $e");
                               }
-                            },
+                            }
+                          },
+                          child: Material(
+                            borderRadius: BorderRadius.circular(20.0),
+                            shadowColor: Colors.greenAccent,
+                            color: Colors.green,
+                            elevation: 7.0,
                             child: Center(
                               child: Text(
                                 'SIGNUP',
@@ -150,8 +143,8 @@ class SignupScreenState extends State<SignupPage> {
                                     fontFamily: 'Montserrat'),
                               ),
                             ),
-                          ),
-                        )),
+                          )),
+                    ),
                     SizedBox(height: 20.0),
                     Container(
                       height: 40.0,
