@@ -14,10 +14,11 @@ class SignupScreenState extends State<SignupPage> {
   TextEditingController emailInputController = new TextEditingController();
   TextEditingController pwdInputController = new TextEditingController();
   TextEditingController nameInputController = new TextEditingController();
-
+  final scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
+        key: scaffoldKey,
         resizeToAvoidBottomPadding: false,
         body: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <
             Widget>[
@@ -55,7 +56,6 @@ class SignupScreenState extends State<SignupPage> {
                     TextFormField(
                       decoration: InputDecoration(
                           labelText: 'NAME ',
-                          hintText: 'Razer',
                           labelStyle: TextStyle(
                               fontFamily: 'Montserrat',
                               fontWeight: FontWeight.bold,
@@ -72,7 +72,7 @@ class SignupScreenState extends State<SignupPage> {
                               fontFamily: 'Montserrat',
                               fontWeight: FontWeight.bold,
                               color: Colors.grey),
-                          hintText: 'EMAIL@gmail.com',
+
                           // hintStyle: ,
                           focusedBorder: UnderlineInputBorder(
                               borderSide: BorderSide(color: Colors.green))),
@@ -122,8 +122,14 @@ class SignupScreenState extends State<SignupPage> {
                                 }).catchError((err) =>
                                         print("Failed to add user: $err"));
                               } on FirebaseAuthException catch (e) {
-                                if (e.code == 'email-already-in-use')
+                                if (e.code == 'email-already-in-use') {
                                   print("SignUp : Email already In use");
+                                  scaffoldKey.currentState.showSnackBar(
+                                      SnackBar(
+                                          content: Text(
+                                              "Email already Registered")));
+                                  emailInputController.clear();
+                                }
                               } catch (e) {
                                 print("SignUp : $e");
                               }

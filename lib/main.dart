@@ -1,3 +1,4 @@
+import 'package:Giveaway/Fragments/DonateFormFragment/donateFormFragment.dart';
 import 'package:Giveaway/home.dart';
 import 'package:Giveaway/signup.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +17,8 @@ class MyApp extends StatelessWidget {
         '/signin': (BuildContext context) => new SignInScreen(),
         '/signup': (BuildContext context) => new SignupPage(),
         '/home': (BuildContext context) => new HomeScreen(),
+        '/donateForm': (BuildContext context) =>
+            new DonateFormFragment('Private'),
       },
       home: new SignInScreen(),
     );

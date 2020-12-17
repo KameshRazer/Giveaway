@@ -1,3 +1,4 @@
+import 'package:Giveaway/components/planetSummary.dart';
 import 'package:flutter/material.dart';
 import 'Fragments/HomeFragment/homeFragment.dart';
 import 'Fragments/DonateFormFragment/donateFormFragment.dart';
@@ -52,7 +53,7 @@ class HomeScreenState extends State<HomeScreen> {
         return new HomeFragment();
         break;
       case 1:
-        return new DonateFormFragment();
+        return new DonateFormFragment('Public');
         break;
       case 2:
         return new ProfileFragment();

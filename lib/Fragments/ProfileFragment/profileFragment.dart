@@ -141,7 +141,10 @@ class _ProfileState extends State<Profile1> {
                         text: 'Help & Support',
                       ),
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.of(context, rootNavigator: true)
+                              .pushReplacementNamed('/signin');
+                        },
                         child: ProfileListItem(
                           icon: LineAwesomeIcons.alternate_sign_out,
                           text: 'Logout',

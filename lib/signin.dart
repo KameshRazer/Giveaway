@@ -10,12 +10,16 @@ class SignInScreen extends StatefulWidget {
 
 class SignInScreenState extends State<SignInScreen> {
   final GlobalKey<FormState> loginFormKey = GlobalKey<FormState>();
-  TextEditingController emailInputController = new TextEditingController();
-  TextEditingController passInputController = new TextEditingController();
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+  TextEditingController emailInputController =
+      new TextEditingController(text: "ghost@gmail.com");
+  TextEditingController passInputController =
+      new TextEditingController(text: "123456789");
   @override
   Widget build(BuildContext context) {
     return new SafeArea(
         child: Scaffold(
+            key: scaffoldKey,
             resizeToAvoidBottomPadding: false,
             body: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -106,7 +110,7 @@ class SignInScreenState extends State<SignInScreen> {
                                 child: GestureDetector(
                                   onTap: () {
                                     if (loginFormKey.currentState.validate()) {
-                                      checkLogin();
+                                      checkLogin(context);
                                     }
                                   },
                                   child: Material(
@@ -156,7 +160,7 @@ class SignInScreenState extends State<SignInScreen> {
             )));
   }
 
-  Future checkLogin() async {
+  Future checkLogin(BuildContext context) async {
     try {
       await Firebase.initializeApp();
       UserCredential user = await FirebaseAuth.instance
@@ -168,6 +172,8 @@ class SignInScreenState extends State<SignInScreen> {
         Navigator.of(context).pushReplacementNamed('/home');
       }).catchError((onError) {
         print("Login Error : ${onError.message} ");
+        scaffoldKey.currentState
+            .showSnackBar(SnackBar(content: Text("Invalid User Credential")));
         emailInputController.clear();
         passInputController.clear();
       });
