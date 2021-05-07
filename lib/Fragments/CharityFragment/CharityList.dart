@@ -1,11 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:Giveaway/components/separator.dart';
-import 'package:Giveaway/Fragments/HomeFragment/charityDescription.dart';
-import 'package:Giveaway/Fragments/HomeFragment/textStyle.dart';
+import 'package:GiveLife/Fragments/CharityFragment/CharityDetailPage.dart';
+import 'package:GiveLife/Components/text_style.dart';
+import 'Charity.dart';
 
 class CharityList extends StatelessWidget {
-  final DocumentSnapshot charity;
+  final Charity charity;
   final bool horizontal;
 
   CharityList(this.charity, {this.horizontal = true});
@@ -15,50 +14,41 @@ class CharityList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final planetThumbnail = new Container(
-      margin: new EdgeInsets.symmetric(vertical: horizontal ? 9.0 : 43.0),
+      margin: new EdgeInsets.symmetric(vertical: horizontal ? 13.0 : 30.0),
       alignment:
           horizontal ? FractionalOffset.centerLeft : FractionalOffset.center,
       child: new Hero(
-          tag: "charity-hero-${charity.id}",
-          child: new CircleAvatar(
-            radius: horizontal ? 25.0 : 43.0,
-            backgroundColor: Colors.black,
-            backgroundImage: NetworkImage(charity['imgurl']),
-          )),
+        tag: "charity-hero-${charity.id}",
+        child: new CircleAvatar(
+          radius: horizontal ? 22.0 : 43.0,
+          backgroundColor: Colors.black,
+          backgroundImage: NetworkImage(charity.picture),
+        ),
+      ),
     );
-
-    // Widget _planetValue({String value}) {
-    //   return new Container(
-    //     child: new Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
-    //       // new Image.asset(image, height: 12.0),
-    //       new Container(width: 8.0),
-    //       new Text("11", style: Style.smallTextStyle),
-    //     ]),
-    //   );
-    // }
 
     final planetCardContent = new Container(
       margin: new EdgeInsets.fromLTRB(
-          horizontal ? 42.0 : 10.0, horizontal ? 8.0 : 42.0, 16.0, 16.0),
+          horizontal ? 36.0 : 16.0, horizontal ? 6.0 : 50.0, 16.0, 10.0),
       constraints: new BoxConstraints.expand(),
       child: new Column(
         crossAxisAlignment:
             horizontal ? CrossAxisAlignment.start : CrossAxisAlignment.center,
         children: <Widget>[
-          new Container(height: 3.0),
-          new Text(charity['name'], style: Style.titleTextStyle),
           new Container(height: 4.0),
-          new Text(charity['location'], style: Style.commonTextStyle),
+          new Text(charity.name, style: Style.titleTextStyle),
+          new Container(height: 10.0),
+          new Text(charity.location, style: Style.commonTextStyle),
         ],
       ),
     );
 
     final planetCard = new Container(
       child: planetCardContent,
-      height: horizontal ? 69.0 : 134.0,
+      height: horizontal ? 70.0 : 134.0,
       margin: horizontal
-          ? new EdgeInsets.only(left: 25.0)
-          : new EdgeInsets.only(top: 92.0),
+          ? new EdgeInsets.only(left: 23.0)
+          : new EdgeInsets.only(top: 72.0),
       decoration: new BoxDecoration(
         color: new Color(0xFF333366),
         shape: BoxShape.rectangle,
@@ -66,8 +56,8 @@ class CharityList extends StatelessWidget {
         boxShadow: <BoxShadow>[
           new BoxShadow(
             color: Colors.black12,
-            blurRadius: 30.0,
-            offset: new Offset(0.0, 5.0),
+            blurRadius: 10.0,
+            offset: new Offset(0.0, 10.0),
           ),
         ],
       ),

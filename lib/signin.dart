@@ -1,7 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/material.dart';
-import 'components/validate.dart';
+import 'Components/validate.dart';
+import 'package:loading_overlay/loading_overlay.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignInScreen extends StatefulWidget {
   @override
@@ -11,164 +15,231 @@ class SignInScreen extends StatefulWidget {
 class SignInScreenState extends State<SignInScreen> {
   final GlobalKey<FormState> loginFormKey = GlobalKey<FormState>();
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  var isLoading = false;
   TextEditingController emailInputController =
-      new TextEditingController(text: "ghost@gmail.com");
+      new TextEditingController(text: "public1@gmail.com");
   TextEditingController passInputController =
       new TextEditingController(text: "123456789");
+  var spinkit;
+
+  @override
+  void initState() {
+    super.initState();
+    // sendNotification();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return new SafeArea(
-        child: Scaffold(
-            key: scaffoldKey,
-            resizeToAvoidBottomPadding: false,
-            body: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                  child: Stack(
-                    children: <Widget>[
-                      Container(
-                        padding: EdgeInsets.fromLTRB(15.0, 40.0, 0.0, 0.0),
-                        child: Text('Give',
-                            style: TextStyle(
-                                fontSize: 80.0, fontWeight: FontWeight.bold)),
-                      ),
-                      Container(
-                        padding: EdgeInsets.fromLTRB(16.0, 105.0, 0.0, 0.0),
-                        child: Text('Away',
-                            style: TextStyle(
-                                fontSize: 80.0, fontWeight: FontWeight.bold)),
-                      ),
-                      Container(
-                        padding: EdgeInsets.fromLTRB(210.0, 175.0, 0.0, 0.0),
-                        child: Text('Small Action, BIG Change!',
-                            style: TextStyle(
-                                fontSize: 13.0,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.green)),
-                      )
-                    ],
-                  ),
-                ),
-                Container(
-                    padding:
-                        EdgeInsets.only(top: 15.0, left: 20.0, right: 20.0),
-                    child: Form(
-                        key: loginFormKey,
-                        child: Column(
-                          children: <Widget>[
-                            TextFormField(
-                              validator: emailValidator,
-                              controller: emailInputController,
-                              keyboardType: TextInputType.emailAddress,
-                              decoration: InputDecoration(
-                                  labelText: 'EMAIL',
-                                  labelStyle: TextStyle(
-                                      fontFamily: 'Montserrat',
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.grey),
-                                  focusedBorder: UnderlineInputBorder(
-                                      borderSide:
-                                          BorderSide(color: Colors.green))),
-                            ),
-                            SizedBox(height: 20.0),
-                            TextFormField(
-                              controller: passInputController,
-                              keyboardType: TextInputType.text,
-                              decoration: InputDecoration(
-                                  labelText: 'PASSWORD',
-                                  labelStyle: TextStyle(
-                                      fontFamily: 'Montserrat',
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.grey),
-                                  focusedBorder: UnderlineInputBorder(
-                                      borderSide:
-                                          BorderSide(color: Colors.green))),
-                              obscureText: true,
-                            ),
-                            SizedBox(height: 5.0),
-                            Container(
-                              alignment: Alignment(1.0, 0.0),
-                              padding: EdgeInsets.only(top: 15.0, left: 20.0),
-                              child: InkWell(
-                                onTap: () {
-                                  showReset();
-                                },
-                                child: Text(
-                                  'Forgot Password?',
-                                  style: TextStyle(
-                                      color: Colors.green,
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily: 'Montserrat',
-                                      decoration: TextDecoration.underline),
-                                ),
+    var deviceSize = MediaQuery.of(context).size;
+    spinkit = SpinKitFadingCircle(
+      itemBuilder: (BuildContext context, int index) {
+        return DecoratedBox(
+          decoration: BoxDecoration(
+            color: index.isEven ? Colors.red : Colors.green,
+          ),
+        );
+      },
+    );
+    ScreenUtil.init(
+        BoxConstraints(
+            maxWidth: deviceSize.width, maxHeight: deviceSize.height),
+        designSize: Size(deviceSize.width, deviceSize.height),
+        allowFontScaling: false);
+
+    return new LoadingOverlay(
+      child: SafeArea(
+          child: Scaffold(
+              key: scaffoldKey,
+              resizeToAvoidBottomPadding: false,
+              body: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Container(
+                    child: Stack(
+                      children: <Widget>[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(
+                                  deviceSize.width * 0.01,
+                                  deviceSize.height * 0.2,
+                                  0.0,
+                                  0.0),
+                              child: SafeArea(
+                                child: Container(
+                                    width: deviceSize.width * 0.19,
+                                    height: deviceSize.width * 0.19,
+                                    decoration: BoxDecoration(
+                                        // color: Colors.green,
+                                        borderRadius:
+                                            BorderRadius.circular(50.r)),
+                                    child: Image.asset('assets/logo.png')),
                               ),
                             ),
-                            SizedBox(height: 40.0),
                             Container(
-                                height: 40.0,
-                                child: GestureDetector(
+                              padding: EdgeInsets.fromLTRB(
+                                  deviceSize.width * 0.025,
+                                  deviceSize.height * 0.17,
+                                  0.0,
+                                  0.0),
+                              child: Text('GiveLife',
+                                  style: TextStyle(
+                                    fontSize: 52.ssp,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Courgette',
+                                  )),
+                            ),
+                          ],
+                        ),
+                        Container(
+                          padding: EdgeInsets.fromLTRB(deviceSize.width * 0.42,
+                              deviceSize.height * 0.26, 0.0, 0.0),
+                          child: Text('Small Action, BIG Change!',
+                              style: TextStyle(
+                                  fontSize: 13.ssp,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.green)),
+                        )
+                      ],
+                    ),
+                  ),
+                  Container(
+                      padding: EdgeInsets.only(
+                          top: deviceSize.height * 0.06,
+                          left: deviceSize.width * 0.05,
+                          right: deviceSize.width * 0.05),
+                      child: Form(
+                          key: loginFormKey,
+                          child: Column(
+                            children: <Widget>[
+                              TextFormField(
+                                validator: emailValidator,
+                                controller: emailInputController,
+                                keyboardType: TextInputType.emailAddress,
+                                decoration: InputDecoration(
+                                    labelText: 'EMAIL',
+                                    labelStyle: TextStyle(
+                                        fontFamily: 'Montserrat',
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.grey),
+                                    focusedBorder: UnderlineInputBorder(
+                                        borderSide:
+                                            BorderSide(color: Colors.green))),
+                              ),
+                              SizedBox(height: 0.022.sh),
+                              TextFormField(
+                                controller: passInputController,
+                                keyboardType: TextInputType.text,
+                                decoration: InputDecoration(
+                                    labelText: 'PASSWORD',
+                                    labelStyle: TextStyle(
+                                        fontFamily: 'Montserrat',
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.grey),
+                                    focusedBorder: UnderlineInputBorder(
+                                        borderSide:
+                                            BorderSide(color: Colors.green))),
+                                obscureText: true,
+                              ),
+                              SizedBox(height: 0.022.sh),
+                              Container(
+                                alignment: Alignment(1.0, 0.0),
+                                padding: EdgeInsets.only(
+                                    top: 0.025.sh, left: 0.020.sw),
+                                child: InkWell(
                                   onTap: () {
-                                    if (loginFormKey.currentState.validate()) {
-                                      checkLogin(context);
-                                    }
+                                    showReset();
                                   },
-                                  child: Material(
-                                    borderRadius: BorderRadius.circular(20.0),
-                                    shadowColor: Colors.greenAccent,
-                                    color: Colors.green,
-                                    elevation: 7.0,
-                                    child: Center(
-                                      child: Text(
-                                        'LOGIN',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                            fontFamily: 'Montserrat'),
+                                  child: Text(
+                                    'Forgot Password?',
+                                    style: TextStyle(
+                                        color: Colors.green,
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: 'Montserrat',
+                                        decoration: TextDecoration.underline),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 0.040.sh),
+                              Container(
+                                  height: 0.05.sh,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      FocusScopeNode currentFocus =
+                                          FocusScope.of(context);
+
+                                      if (!currentFocus.hasPrimaryFocus) {
+                                        currentFocus.unfocus();
+                                      }
+                                      if (loginFormKey.currentState
+                                          .validate()) {
+                                        checkLogin(context);
+                                      }
+                                    },
+                                    child: Material(
+                                      borderRadius: BorderRadius.circular(18.r),
+                                      shadowColor: Colors.greenAccent,
+                                      color: Color(0xFF4CAF50),
+                                      elevation: 7.0,
+                                      child: Center(
+                                        child: Text(
+                                          'LOGIN',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                              fontFamily: 'Montserrat'),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                )),
-                            SizedBox(height: 20.0),
-                          ],
-                        ))),
-                SizedBox(height: 15.0),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text(
-                      'New to GiveAway ?',
-                      style: TextStyle(fontFamily: 'Montserrat'),
-                    ),
-                    SizedBox(width: 5.0),
-                    InkWell(
-                      onTap: () {
-                        Navigator.of(context).pushNamed('/signup');
-                      },
-                      child: Text(
-                        'Register',
-                        style: TextStyle(
-                            color: Colors.green,
-                            fontFamily: 'Montserrat',
-                            fontWeight: FontWeight.bold,
-                            decoration: TextDecoration.underline),
+                                  )),
+                              SizedBox(height: 0.020.sh),
+                            ],
+                          ))),
+                  SizedBox(height: 0.025.sh),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        'New to GiveAway ?',
+                        style: TextStyle(fontFamily: 'Montserrat'),
                       ),
-                    )
-                  ],
-                )
-              ],
-            )));
+                      SizedBox(width: 0.03.sw),
+                      InkWell(
+                        onTap: () {
+                          Navigator.of(context).pushNamed('/signup');
+                        },
+                        child: Text(
+                          'Register',
+                          style: TextStyle(
+                              color: Colors.green,
+                              fontFamily: 'Montserrat',
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline),
+                        ),
+                      )
+                    ],
+                  )
+                ],
+              ))),
+      isLoading: isLoading,
+      opacity: 0.5,
+      progressIndicator: CircularProgressIndicator(),
+    );
   }
 
   Future checkLogin(BuildContext context) async {
     try {
+      setState(() {
+        isLoading = true;
+      });
       await Firebase.initializeApp();
       UserCredential user = await FirebaseAuth.instance
           .signInWithEmailAndPassword(
               email: emailInputController.text,
               password: passInputController.text)
           .then((value) async {
-        print("LOGIN SUCESS :");
+        // print("LOGIN SUCESS :");
         Navigator.of(context).pushReplacementNamed('/home');
       }).catchError((onError) {
         print("Login Error : ${onError.message} ");
@@ -176,6 +247,10 @@ class SignInScreenState extends State<SignInScreen> {
             .showSnackBar(SnackBar(content: Text("Invalid User Credential")));
         emailInputController.clear();
         passInputController.clear();
+        if (this.mounted)
+          setState(() {
+            isLoading = false;
+          });
       });
     } catch (e) {
       print("Error ${e.message}");
@@ -189,8 +264,8 @@ class SignInScreenState extends State<SignInScreen> {
         builder: (BuildContext context) {
           return AlertDialog(
             content: Container(
-              width: MediaQuery.of(context).size.width / 1.3,
-              height: MediaQuery.of(context).size.height / 5,
+              width: 0.33.sw,
+              height: 0.15.sh,
               child: Column(
                 children: <Widget>[
                   TextFormField(
@@ -209,11 +284,11 @@ class SignInScreenState extends State<SignInScreen> {
                         labelStyle: TextStyle(color: Colors.black)),
                   ),
                   SizedBox(
-                    height: 10.0,
+                    height: 0.02.sh,
                   ),
                   Material(
                     elevation: 5.0,
-                    borderRadius: BorderRadius.circular(25.0),
+                    borderRadius: BorderRadius.circular(25.r),
                     color: Colors.white,
                     child: MaterialButton(
                       onPressed: () async {
@@ -222,11 +297,12 @@ class SignInScreenState extends State<SignInScreen> {
                         FirebaseAuth.instance.sendPasswordResetEmail(
                             email: emailresetController.text);
                       },
-                      padding: EdgeInsets.fromLTRB(10.0, 15.0, 10.0, 15.0),
+                      padding: EdgeInsets.fromLTRB(
+                          0.010.sw, 0.015.sh, 0.010.sw, 0.015.sh),
                       child: Text(
                         'Reset',
                         style: TextStyle(
-                            fontSize: 20.0,
+                            fontSize: 20.ssp,
                             color: Colors.black,
                             fontWeight: FontWeight.bold),
                       ),

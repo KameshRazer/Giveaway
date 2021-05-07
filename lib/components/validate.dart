@@ -16,3 +16,19 @@ String pwdValidator(String value) {
     return null;
   }
 }
+
+String phoneNoValidator(String value) {
+  if (value.length < 10 || value.contains('.') || value.contains(',')) {
+    return 'Invalid Phone Number';
+  } else {
+    return null;
+  }
+}
+
+String nameValidator(String value) {
+  if (value.length == 0) {
+    return 'Enter Name';
+  } else {
+    return null;
+  }
+}

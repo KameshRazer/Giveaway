@@ -6,9 +6,9 @@ import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
-import 'package:Giveaway/components/constants.dart';
-import 'package:Giveaway/Fragments/ProfileFragment/Profile_list_item.dart';
-import 'package:Giveaway/widgets/TimelineWidget.dart';
+import 'package:GiveLife/components/constants.dart';
+import 'package:GiveLife/Fragments/ProfileFragment/Profile_list_item.dart';
+import 'package:GiveLife/widgets/TimelineWidget.dart';
 
 class Profile1 extends StatefulWidget {
   @override
@@ -27,7 +27,13 @@ class _ProfileState extends State<Profile1> {
   Widget build(BuildContext context) {
     User currentUser = FirebaseAuth.instance.currentUser;
     CollectionReference users = FirebaseFirestore.instance.collection("users");
-    ScreenUtil.init(context, height: 896, width: 414, allowFontScaling: true);
+    // ScreenUtil.init(context, height: 896, width: 414, allowFontScaling: true);
+    var deviceSize = MediaQuery.of(context).size;
+    ScreenUtil.init(
+        BoxConstraints(
+            maxWidth: deviceSize.width, maxHeight: deviceSize.height),
+        designSize: Size(deviceSize.width, deviceSize.height),
+        allowFontScaling: true);
 
     return FutureBuilder<DocumentSnapshot>(
         future: users.doc(currentUser.uid).get(),
@@ -51,31 +57,32 @@ class _ProfileState extends State<Profile1> {
       child: Column(
         children: <Widget>[
           Container(
-            height: kSpacingUnit.w * 10,
-            width: kSpacingUnit.w * 10,
-            margin: EdgeInsets.only(top: kSpacingUnit.w * 3),
+            height: 0.3.sw,
+            width: 0.3.sw,
+            margin: EdgeInsets.only(top: 0.010.sh),
             child: Stack(
               children: <Widget>[
                 CircleAvatar(
-                  radius: kSpacingUnit.w * 5,
+                  radius: 60.r,
                   backgroundImage: NetworkImage(strImageURL),
                 ),
                 Align(
-                  alignment: Alignment.bottomRight,
+                  alignment: Alignment.bottomRight / 1.37,
                   child: Container(
-                    height: kSpacingUnit.w * 2.5,
-                    width: kSpacingUnit.w * 2.5,
+                    height: 0.07.sw,
+                    width: 0.07.sw,
+                    // color: Colors.green,
                     decoration: BoxDecoration(
                       color: Theme.of(context).accentColor,
                       shape: BoxShape.circle,
                     ),
                     child: Center(
-                      heightFactor: kSpacingUnit.w * 1.5,
-                      widthFactor: kSpacingUnit.w * 1.5,
+                      heightFactor: 0.2.sh,
+                      widthFactor: 0.2.sw,
                       child: Icon(
                         LineAwesomeIcons.pen,
                         color: kDarkPrimaryColor,
-                        size: ScreenUtil().setSp(kSpacingUnit.w * 1.5),
+                        size: 18.ssp,
                       ),
                     ),
                   ),
@@ -83,17 +90,17 @@ class _ProfileState extends State<Profile1> {
               ],
             ),
           ),
-          SizedBox(height: kSpacingUnit.w * 2),
+          SizedBox(height: 0.02.sh),
           Text(
             name,
             style: kTitleTextStyle,
           ),
-          SizedBox(height: kSpacingUnit.w * 0.5),
+          SizedBox(height: 0.01.sh),
           Text(
             email,
             style: kCaptionTextStyle,
           ),
-          SizedBox(height: kSpacingUnit.w * 2),
+          SizedBox(height: 0.02.sh),
         ],
       ),
     );
@@ -101,9 +108,9 @@ class _ProfileState extends State<Profile1> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        SizedBox(width: kSpacingUnit.w * 3),
+        SizedBox(width: 0.08.sw),
         profileInfo,
-        SizedBox(width: kSpacingUnit.w * 3),
+        SizedBox(width: 0.08.sw),
       ],
     );
 
@@ -111,12 +118,24 @@ class _ProfileState extends State<Profile1> {
       child: Builder(
         builder: (context) {
           return Scaffold(
+            appBar: AppBar(
+              title: Text(
+                'My Profile',
+                style: TextStyle(
+                  // fontSize: 25.ssp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              backgroundColor: Colors.green,
+            ),
             body: Column(
               children: <Widget>[
-                SizedBox(height: kSpacingUnit.w * 5),
+                SizedBox(height: 0.08.sh),
                 header,
                 Expanded(
                   child: ListView(
+                    shrinkWrap: true,
                     children: <Widget>[
                       ProfileListItem(
                         icon: LineAwesomeIcons.user_shield,
@@ -137,6 +156,7 @@ class _ProfileState extends State<Profile1> {
                         ),
                       ),
                       ProfileListItem(
+                        // key: ,
                         icon: LineAwesomeIcons.question_circle,
                         text: 'Help & Support',
                       ),

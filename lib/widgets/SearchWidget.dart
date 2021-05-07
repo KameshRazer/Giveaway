@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class SearchWidget extends StatelessWidget {
   TextEditingController SearchText = new TextEditingController();
+  // SearchWidget(this.SearchText);
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -18,12 +19,17 @@ class SearchWidget extends StatelessWidget {
             ),
           ),
           filled: true,
-          prefixIcon: Icon(
-            Icons.search,
-            color: Color(0xFFfb3132),
+          suffixIcon: GestureDetector(
+            onTap: () {
+              print(SearchText.text);
+            },
+            child: Icon(
+              Icons.search,
+              color: Color(0xFFfb3132),
+            ),
           ),
           fillColor: Color(0xFFFAFAFA),
-          suffixIcon: Icon(
+          prefixIcon: Icon(
             Icons.sort,
             color: Color(0xFFfb3132),
           ),

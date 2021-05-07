@@ -63,7 +63,7 @@ class _TimelinePageState extends State<TimelinePage> {
             imageurl = "assets/images/topmenu/ic_others.png";
             break;
         }
-        if (elt['Donor'] == id) {
+        if (elt['Benefactor'] == id || elt['Donor'] == id) {
           setState(() {
             doodles.add(Doodle(
                 name: elt['Itemcontact'],
@@ -91,7 +91,9 @@ class _TimelinePageState extends State<TimelinePage> {
   @override
   Widget build(BuildContext context) {
     List<Widget> pages = [
+      // timelineModel(TimelinePosition.Left),
       timelineModel(TimelinePosition.Center),
+      timelineModel(TimelinePosition.Right)
     ];
 
     return Scaffold(

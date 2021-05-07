@@ -8,12 +8,49 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:38217441793:android:4098542e410d4b613ad600",
+        "android_client_info": {
+          "package_name": "com.example.GiveLife"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "38217441793-fcmlgoorvs8g4u5g988613r3rbf50bf4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWMx9cq0dHn6JUV3nY4rIDRijskecaW60"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "38217441793-fcmlgoorvs8g4u5g988613r3rbf50bf4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:38217441793:android:1c06effe3c6f29b83ad600",
         "android_client_info": {
           "package_name": "com.example.Giveaway"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "38217441793-qv70p75n65s8474q64o5ag161709r8ce.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.Giveaway",
+            "certificate_hash": "421e09d3272b5b38084c953db2cddbe168c4e52a"
+          }
+        },
         {
           "client_id": "38217441793-fcmlgoorvs8g4u5g988613r3rbf50bf4.apps.googleusercontent.com",
           "client_type": 3

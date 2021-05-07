@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-// import 'package:line_awesome_flutter/line_awesome_flutter.dart';
-import 'package:Giveaway/components/constants.dart';
 
 class ProfileListItem extends StatelessWidget {
   final IconData icon;
@@ -9,49 +7,59 @@ class ProfileListItem extends StatelessWidget {
   final bool hasNavigation;
 
   const ProfileListItem({
-    Key key,
+    // Key key,
     this.icon,
     this.text,
     this.hasNavigation = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
+    var deviceSize = MediaQuery.of(context).size;
+    ScreenUtil.init(
+        BoxConstraints(
+            maxWidth: deviceSize.width, maxHeight: deviceSize.height),
+        designSize: Size(deviceSize.width, deviceSize.height),
+        allowFontScaling: true);
     return Container(
-      height: kSpacingUnit.w * 5.5,
+      // width: 0.73.sw,
+      height: 0.07.sh,
       margin: EdgeInsets.symmetric(
-        horizontal: kSpacingUnit.w * 4,
+        horizontal: 0.08.sw,
       ).copyWith(
-        bottom: kSpacingUnit.w * 2,
+        bottom: 0.05.sw,
       ),
-      padding: EdgeInsets.symmetric(
-        horizontal: kSpacingUnit.w * 2,
-      ),
+      // padding: EdgeInsets.symmetric(
+      //   horizontal: 100.w,
+      // ),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(kSpacingUnit.w * 3),
+        borderRadius: BorderRadius.circular(25.r),
         color: Theme.of(context).backgroundColor,
       ),
-      child: Row(
+      child: (Row(
+        // mainAxisAlignment: MainAxisAlignment.center,
+        // crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
+          SizedBox(width: 0.05.sw),
           Icon(
             this.icon,
-            size: kSpacingUnit.w * 2.5,
+            size: 0.08.sw,
           ),
-          SizedBox(width: kSpacingUnit.w * 1.5),
-          Text(
-            this.text,
-            style: kTitleTextStyle.copyWith(
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          Spacer(),
+          SizedBox(width: 0.05.sw),
+          Text(this.text,
+              style: TextStyle(
+                fontSize: 16.ssp,
+                fontWeight: FontWeight.w600,
+              )),
+
+          // Spacer(),
           /*if (this.hasNavigation)
             Icon(
               LineAwesomeIcons.angle_right,
               size: kSpacingUnit.w * 2.5,
             ),*/
         ],
-      ),
+      )),
     );
   }
 }

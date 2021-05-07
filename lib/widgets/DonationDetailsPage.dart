@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../widgets/TimelineWidget.dart';
 import 'package:intl/intl.dart';
+import '../Components/Notification.dart' as myNotificationFile;
 /*class DonationDetailsPage extends StatefulWidget {
   @override
   _DonationDetailsPageState createState() => _DonationDetailsPageState();
@@ -18,6 +19,7 @@ class DonationDetailsPage extends StatelessWidget {
   String productDescription;
   String productLocation;
   String productContact;
+  String mode;
 
   DonationDetailsPage(
       {Key key,
@@ -29,7 +31,8 @@ class DonationDetailsPage extends StatelessWidget {
       @required this.productHost,
       @required this.productDescription,
       @required this.productLocation,
-      @required this.productContact})
+      @required this.productContact,
+      @required this.mode})
       : super(key: key);
 
   @override
@@ -79,9 +82,7 @@ class DonationDetailsPage extends StatelessWidget {
               SizedBox(
                 height: 1,
               ),
-              AddToCartMenu(
-                productId: productId,
-              ),
+              AddToCartMenu(productId: productId, mode: mode),
               SizedBox(
                 height: 15,
               ),
@@ -158,9 +159,9 @@ class DonationTitleWidget extends StatelessWidget {
                   fontWeight: FontWeight.w500),
             ),
             Text(
-              productQuantity,
+              'Quantity : ' + productQuantity,
               style: TextStyle(
-                  fontSize: 20,
+                  fontSize: 18,
                   color: Color(0xFF3a3a3b),
                   fontWeight: FontWeight.w500),
             ),
@@ -245,7 +246,6 @@ class BottomMenu extends StatelessWidget {
               )
             ],
           ),
-          
         ],
       ),
     );
@@ -253,26 +253,29 @@ class BottomMenu extends StatelessWidget {
 }
 
 class AddToCartMenu extends StatelessWidget {
+  var myNotification = new myNotificationFile.Notification();
   String productId;
-  AddToCartMenu({
-    Key key,
-    @required this.productId,
-  }) : super(key: key);
+  String mode;
+  AddToCartMenu({Key key, @required this.productId, @required this.mode})
+      : super(key: key);
   _additem() async {
     String id = FirebaseAuth.instance.currentUser.uid;
-    print(id);
+    // print(id);
     CollectionReference ds = FirebaseFirestore.instance.collection('Donation');
     ds.doc(productId).update({"Benefactor": id, "Status": "Requested"});
-    print("Itemupdated");
+    // print("Itemupdated");
+
     CollectionReference ds1 = FirebaseFirestore.instance.collection('users');
     DateTime now = DateTime.now();
-    String cur_time = DateFormat('kk:mm:ss \n EEE d MMM').format(now);
+    String cur_time =
+        now.toString(); // DateFormat('kk:mm:ss \n EEE d MMM').format(now);
     ds1.doc(id).update({
       "RequestsCart": FieldValue.arrayUnion([
         {"ID": productId}
       ])
     });
-    print("Itemupdated");
+    // print("Itemupdated");
+    myNotification.sendNotification(productId, mode);
   }
 
   @override
@@ -282,7 +285,16 @@ class AddToCartMenu extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           InkWell(
-            onTap: () {},
+            onTap: () {
+              print("Tapped");
+              _additem();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        TimelinePage(title: 'Your GiveLife History')),
+              );
+            },
             child: Container(
               width: 200.0,
               height: 45.0,
@@ -292,18 +304,10 @@ class AddToCartMenu extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10.0),
               ),
               child: GestureDetector(
-                onTap: () {
-                  _additem();
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            TimelinePage(title: 'Your GiveAway History')),
-                  );
-                },
+                onTap: () {},
                 child: Center(
                   child: Text(
-                    'Get It',
+                    (mode == 'Public') ? 'Get It' : 'Donate',
                     style: new TextStyle(
                         fontSize: 18.0,
                         color: Colors.white,

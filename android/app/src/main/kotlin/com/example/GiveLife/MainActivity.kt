@@ -1,4 +1,4 @@
-package com.example.Giveaway
+package com.example.GiveLife
 
 import io.flutter.embedding.android.FlutterActivity
 

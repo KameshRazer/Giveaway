@@ -4,32 +4,27 @@ import 'package:flutter/cupertino.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-// import 'dart:async';
-import 'package:intl/intl.dart';
 
 class DonateFormFragment extends StatefulWidget {
   final String type;
-  DonateFormFragment(this.type);
+  final String charityId;
+  DonateFormFragment({Key key, @required this.type, this.charityId = "default"})
+      : super(key: key);
+
   @override
-  DonateFragmentState createState() => DonateFragmentState();
+  DonateFormFragmentState createState() => DonateFormFragmentState();
 }
 
-class DonateFragmentState extends State<DonateFormFragment> {
+class DonateFormFragmentState extends State<DonateFormFragment> {
   Position currentPosition;
   final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
   String currentAddress;
-  String Taskname,
-      Taskquantity,
-      Taskunit,
-      Taskloc,
-      TaskContact,
-      TaskDesc,
-      cur_time,
-      TaskExpire;
+  String currTime;
+  String charityId = null;
   TextEditingController _tasknamecont,
       _taskquantity,
       _taskunit,
@@ -39,14 +34,14 @@ class DonateFragmentState extends State<DonateFormFragment> {
       _taskExpire;
   double lati = 0.0, longi = 0.0;
   GeoPoint posi;
-  getlocation() async {
-    Position position = await Geolocator()
-        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    setState(() {
-      lati = position.latitude;
-      longi = position.longitude;
-    });
-  }
+  // getlocation() async {
+  //   Position position = await Geolocator()
+  //       .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+  //   setState(() {
+  //     lati = position.latitude;
+  //     longi = position.longitude;
+  //   });
+  // }
 
   @override
   void initState() {
@@ -58,34 +53,32 @@ class DonateFragmentState extends State<DonateFormFragment> {
     _taskcontact = new TextEditingController();
     _taskDesc = new TextEditingController();
     _taskExpire = new TextEditingController();
-    DateTime now = DateTime.now();
-    cur_time = DateFormat('kk:mm:ss \n EEE d MMM').format(now);
+    currTime = DateTime.now().toString();
+    // currTime = DateFormat('kk:mm:ss \n EEE d MMM').format(now);
     getCurrentLocation();
   }
 
   int _mytasktype = 0;
   String taskval;
   void _handleTaskType(int value) {
-    setState(() {
-      _mytasktype = value;
-      switch (value) {
-        case 1:
-          taskval = "Food";
-          break;
-        case 2:
-          taskval = "Clothes";
-          break;
-        case 3:
-          taskval = "Education";
-          break;
-        case 4:
-          taskval = "Medicine";
-          break;
-        case 5:
-          taskval = "others";
-          break;
-      }
-    });
+    if (this.mounted)
+      setState(() {
+        _mytasktype = value;
+        switch (value) {
+          case 1:
+            taskval = "Food";
+            break;
+          case 2:
+            taskval = "Clothes";
+            break;
+          case 3:
+            taskval = "Education";
+            break;
+          case 4:
+            taskval = "Others";
+            break;
+        }
+      });
   }
 
   createData() {
@@ -102,27 +95,42 @@ class DonateFragmentState extends State<DonateFormFragment> {
       'locationpoint': GeoPoint(posi.latitude, posi.longitude),
       'Itemcontact': _taskcontact.text,
       'Itemtype': taskval,
-      'PostedTime': cur_time,
+      'PostedTime': currTime,
       'Status': "Posted",
       'Expire': _taskExpire.text,
       'Type': widget.type,
     };
-    print(tasks);
-    collection.add(tasks).then((val) => {
-          users.doc(FirebaseAuth.instance.currentUser.uid).update({
-            "DonationCart": FieldValue.arrayUnion([val.id])
-          })
-        });
+    if (widget.type == 'Private') {
+      FirebaseFirestore.instance
+          .collection('charity')
+          .doc(widget.charityId)
+          .get()
+          .then((value) {
+        String userId = value.data()['userId'];
+        tasks['Benefactor'] = userId;
+        collection.add(tasks).then((val) => {
+              users.doc(FirebaseAuth.instance.currentUser.uid).update({
+                "DonationCart": FieldValue.arrayUnion([val.id])
+              })
+            });
+      });
+    } else {
+      collection.add(tasks).then((val) => {
+            users.doc(FirebaseAuth.instance.currentUser.uid).update({
+              "DonationCart": FieldValue.arrayUnion([val.id])
+            })
+          });
+    }
   }
 
   getCurrentLocation() {
     geolocator
-        .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
+        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
         .then((Position position) {
-      print('Postion : $position');
-      setState(() {
-        currentPosition = position;
-      });
+      if (this.mounted)
+        setState(() {
+          currentPosition = position;
+        });
       getAddressFromLatLng();
     });
   }
@@ -134,14 +142,13 @@ class DonateFragmentState extends State<DonateFormFragment> {
 
       Placemark place = p[0];
 
-      print(
-          "Address :  ${place.locality},${place.subAdministrativeArea}, ${place.postalCode}, ${place.country}");
-      setState(() {
-        currentAddress =
-            "${place.locality},${place.subAdministrativeArea}, ${place.country}, ${place.postalCode},";
-        _taskloc = new TextEditingController(text: currentAddress);
-        posi = GeoPoint(p[0].position.latitude, p[0].position.longitude);
-      });
+      if (this.mounted)
+        setState(() {
+          currentAddress =
+              "${place.locality},${place.subAdministrativeArea}, ${place.country}, ${place.postalCode},";
+          _taskloc = new TextEditingController(text: currentAddress);
+          posi = GeoPoint(p[0].position.latitude, p[0].position.longitude);
+        });
     } catch (e) {
       print(e);
     }
@@ -155,6 +162,10 @@ class DonateFragmentState extends State<DonateFormFragment> {
     _taskcontact.clear();
     _taskDesc.clear();
     _taskExpire.clear();
+    if (this.mounted)
+      setState(() {
+        _mytasktype = 0;
+      });
   }
 
   final _formKey = GlobalKey<FormState>();
@@ -162,12 +173,18 @@ class DonateFragmentState extends State<DonateFormFragment> {
   @override
   Widget build(BuildContext context) {
     var deviceSize = MediaQuery.of(context).size;
-    return new Scaffold(
+    ScreenUtil.init(
+        BoxConstraints(
+            maxWidth: deviceSize.width, maxHeight: deviceSize.height),
+        designSize: Size(deviceSize.width, deviceSize.height),
+        allowFontScaling: true);
+    return Scaffold(
       key: scaffoldKey,
       appBar: AppBar(
         title: Text(
-          'Giveaway',
+          'Donate Form',
           style: TextStyle(
+            // fontSize: 25.ssp,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
@@ -175,16 +192,21 @@ class DonateFragmentState extends State<DonateFormFragment> {
         backgroundColor: Colors.green,
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(deviceSize.width * .010),
+        padding: EdgeInsets.only(left: 0.016.sw, right: 0.05.sw),
         child: Form(
           key: _formKey,
           child: new Column(
             children: <Widget>[
+              SizedBox(
+                height: 0.020.sh,
+              ),
               new ListTile(
                 leading: const Icon(Icons.person),
                 title: TextFormField(
                   controller: _tasknamecont,
-                  decoration: InputDecoration(labelText: "Item name: "),
+                  decoration: InputDecoration(
+                    labelText: "Item name: ",
+                  ),
                   validator: (value) {
                     if (value.isEmpty) {
                       return 'Please enter Item Name';
@@ -192,6 +214,9 @@ class DonateFragmentState extends State<DonateFormFragment> {
                     return null;
                   },
                 ),
+              ),
+              SizedBox(
+                height: 0.020.sh,
               ),
               new ListTile(
                 leading: const Icon(FontAwesomeIcons.tags),
@@ -208,8 +233,8 @@ class DonateFragmentState extends State<DonateFormFragment> {
                   },
                 ),
               ),
-              const Divider(
-                height: 1.0,
+              SizedBox(
+                height: 0.020.sh,
               ),
               new ListTile(
                 leading: const Icon(
@@ -221,40 +246,57 @@ class DonateFragmentState extends State<DonateFormFragment> {
                   decoration: InputDecoration(labelText: "Quantity: "),
                   validator: (value) {
                     if (value.isEmpty) {
-                      return 'Please enter Quantity';
+                      return 'Please Enter Quantity';
+                    } else if (value.contains(',') ||
+                        value.contains('-') ||
+                        double.parse(value) <= 0) {
+                      return 'Please Enter Correct Format';
                     }
                     return null;
                   },
                 ),
               ),
-              const Divider(
-                height: 1.0,
-              ),
-              new ListTile(
-                leading: const Icon(FontAwesomeIcons.list),
-                title: TextFormField(
-                  controller: _taskunit,
-                  decoration:
-                      InputDecoration(labelText: "Unit: ", hintText: "eg: kgs"),
-                  validator: (value) {
-                    if (value.isEmpty) {
-                      return 'Please enter Unit';
-                    }
-                    return null;
-                  },
+              if (widget.type != 'Private')
+                SizedBox(
+                  height: 0.020.sh,
                 ),
-              ),
-              const Divider(
-                height: 1.0,
+              if (widget.type != 'Private')
+                new ListTile(
+                  leading: const Icon(FontAwesomeIcons.list),
+                  title: TextFormField(
+                    controller: _taskunit,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                        labelText: "Unit: ", hintText: "eg: kgs"),
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return 'Please enter Unit';
+                      } else if (value.contains(',') ||
+                          double.parse(value) <= 0) {
+                        return 'Please Enter Correct Format';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+              SizedBox(
+                height: 0.020.sh,
               ),
               new ListTile(
                   leading: const Icon(Icons.location_on),
                   title: GestureDetector(
                     child: TextFormField(
                       controller: _taskloc,
+                      onTap: () {
+                        // print(currentAddress);
+                        if (_taskloc.text.isEmpty && this.mounted)
+                          setState(() {
+                            _taskloc.text = currentAddress;
+                          });
+                      },
                       decoration: InputDecoration(
                           labelText: "Address: ",
-                          hintText: "eg: 295,2nd main road,Tvl-town"),
+                          hintText: "eg: 295,2nd main road,SVG-town"),
                       validator: (value) {
                         if (value.isEmpty) {
                           return 'Please enter Address';
@@ -263,85 +305,105 @@ class DonateFragmentState extends State<DonateFormFragment> {
                       },
                     ),
                   )),
+              SizedBox(
+                height: 0.020.sh,
+              ),
               new ListTile(
-                leading: const Icon(Icons.phone),
+                leading: const Icon(
+                  Icons.phone,
+                ),
                 title: TextFormField(
                   keyboardType: TextInputType.number,
                   maxLength: 10,
                   controller: _taskcontact,
                   decoration: InputDecoration(
-                      labelText: "Contact: ", hintText: "eg: 9442770493"),
+                      labelText: "Contact: ", hintText: "eg: 9876543210"),
                   validator: (value) {
                     if (value.isEmpty) {
                       return 'Please enter Contact number';
-                    } else if (value.length != 10) {
+                    } else if (value.length != 10 ||
+                        value.contains('.') ||
+                        value.contains(',')) {
                       return 'Enter Valid Contact number';
                     }
                     return null;
                   },
                 ),
               ),
+              SizedBox(
+                height: 0.020.sh,
+              ),
               new ListTile(
                   title: new Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+                // mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
-                  Flexible(
-                      child: Radio(
+                  Radio(
                     value: 1,
                     groupValue: _mytasktype,
                     onChanged: _handleTaskType,
                     activeColor: Colors.blue,
-                  )),
-                  Flexible(
-                      child: Text('Food', style: TextStyle(fontSize: 10.0))),
-                  Flexible(
-                      child: Radio(
+                  ),
+                  Text('Food', style: TextStyle(fontSize: 12.ssp)),
+                  Radio(
                     value: 2,
                     groupValue: _mytasktype,
                     onChanged: _handleTaskType,
                     activeColor: Colors.blue,
-                  )),
-                  Flexible(
-                      child: Text('Clothes', style: TextStyle(fontSize: 10.0))),
-                  Flexible(
-                      child: Radio(
+                  ),
+                  Text('Clothes', style: TextStyle(fontSize: 12.ssp)),
+                  Radio(
                     value: 3,
                     groupValue: _mytasktype,
                     onChanged: _handleTaskType,
                     activeColor: Colors.blue,
-                  )),
-                  Flexible(
-                      child:
-                          Text('Education', style: TextStyle(fontSize: 10.0))),
-                  Flexible(
-                      child: Radio(
+                  ),
+                  Text('Education', style: TextStyle(fontSize: 12.ssp)),
+                  Radio(
                     value: 4,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     groupValue: _mytasktype,
                     onChanged: _handleTaskType,
                     activeColor: Colors.blue,
-                  )),
-                  Flexible(
-                      child: Text('Others', style: TextStyle(fontSize: 10.0)))
+                  ),
+                  Text('Others', style: TextStyle(fontSize: 12.ssp))
                 ],
               )),
+              SizedBox(
+                height: 20.h,
+              ),
               if (taskval == "Food")
                 new ListTile(
                   leading: const Icon(Icons.timer),
                   title: TextFormField(
                     controller: _taskExpire,
+                    keyboardType: TextInputType.datetime,
                     decoration: InputDecoration(
                         labelText: "Expire Time: ", hintText: "In hours"),
                   ),
-                ),
+                )
             ],
           ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
+        backgroundColor: Colors.green,
         onPressed: () {
+          FocusScopeNode currentFocus = FocusScope.of(context);
+
+          if (!currentFocus.hasPrimaryFocus) {
+            currentFocus.unfocus();
+          }
           if (_formKey.currentState.validate()) {
+            if (_mytasktype == 0) {
+              scaffoldKey.currentState.showSnackBar(SnackBar(
+                content: Text('Select Category'),
+              ));
+              return;
+            }
+
             createData();
+
             scaffoldKey.currentState.showSnackBar(SnackBar(
               content: Text('Donation added'),
             ));

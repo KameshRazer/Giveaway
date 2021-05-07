@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'components/validate.dart';
+import 'package:flutter/services.dart';
+import 'Components/validate.dart';
 
 class SignupPage extends StatefulWidget {
   @override
@@ -13,6 +14,7 @@ class SignupScreenState extends State<SignupPage> {
   final GlobalKey<FormState> signupFormKey = GlobalKey<FormState>();
   TextEditingController emailInputController = new TextEditingController();
   TextEditingController pwdInputController = new TextEditingController();
+  TextEditingController phoneNoInputController = new TextEditingController();
   TextEditingController nameInputController = new TextEditingController();
   final scaffoldKey = GlobalKey<ScaffoldState>();
   @override
@@ -63,6 +65,7 @@ class SignupScreenState extends State<SignupPage> {
                           focusedBorder: UnderlineInputBorder(
                               borderSide: BorderSide(color: Colors.green))),
                       controller: nameInputController,
+                      validator: nameValidator,
                     ),
                     SizedBox(height: 10.0),
                     TextFormField(
@@ -78,11 +81,27 @@ class SignupScreenState extends State<SignupPage> {
                               borderSide: BorderSide(color: Colors.green))),
                       controller: emailInputController,
                       validator: emailValidator,
+                      keyboardType: TextInputType.emailAddress,
                     ),
                     SizedBox(height: 10.0),
                     TextFormField(
                       decoration: InputDecoration(
-                          labelText: 'PASSWORD ',
+                          labelText: 'Phone No ',
+                          labelStyle: TextStyle(
+                              fontFamily: 'Montserrat',
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey),
+                          focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.green))),
+                      controller: phoneNoInputController,
+                      validator: phoneNoValidator,
+                      keyboardType: TextInputType.number,
+                      maxLength: 10,
+                    ),
+                    SizedBox(height: 10.0),
+                    TextFormField(
+                      decoration: InputDecoration(
+                          labelText: 'PASSWORD',
                           labelStyle: TextStyle(
                               fontFamily: 'Montserrat',
                               fontWeight: FontWeight.bold,
@@ -92,12 +111,19 @@ class SignupScreenState extends State<SignupPage> {
                       obscureText: true,
                       controller: pwdInputController,
                       validator: pwdValidator,
+                      keyboardType: TextInputType.visiblePassword,
                     ),
                     SizedBox(height: 40.0),
                     Container(
                       height: 40.0,
                       child: GestureDetector(
                           onTap: () async {
+                            FocusScopeNode currentFocus =
+                                FocusScope.of(context);
+
+                            if (!currentFocus.hasPrimaryFocus) {
+                              currentFocus.unfocus();
+                            }
                             if (signupFormKey.currentState.validate()) {
                               await Firebase.initializeApp();
                               try {
@@ -114,7 +140,9 @@ class SignupScreenState extends State<SignupPage> {
                                     .set({
                                   'Email': emailInputController.text,
                                   'Password': pwdInputController.hashCode,
-                                  'Name': nameInputController.text
+                                  'Name': nameInputController.text,
+                                  'type': "Public",
+                                  'Contact': phoneNoInputController.text
                                 }).then((value) {
                                   Navigator.of(context).pop();
                                   Navigator.of(context)
@@ -131,7 +159,7 @@ class SignupScreenState extends State<SignupPage> {
                                   emailInputController.clear();
                                 }
                               } catch (e) {
-                                print("SignUp : $e");
+                                // print("SignUp : $e");
                               }
                             }
                           },

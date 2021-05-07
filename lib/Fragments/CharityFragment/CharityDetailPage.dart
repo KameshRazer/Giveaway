@@ -1,13 +1,14 @@
-import 'package:Giveaway/Fragments/HomeFragment/CharityList.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:GiveLife/Fragments/CharityFragment/CharityList.dart';
+import 'package:GiveLife/Fragments/DonateFormFragment/DonateFormFragment.dart';
 import 'package:flutter/material.dart';
-import 'package:Giveaway/components/separator.dart';
-import 'package:Giveaway/Fragments/HomeFragment/textStyle.dart';
+import 'Charity.dart';
+import 'CharityList.dart';
+import 'package:GiveLife/Components/separator.dart';
+import 'package:GiveLife/Components/text_style.dart';
 
 class DetailPage extends StatelessWidget {
-  final DocumentSnapshot charity;
-  final backImgURL =
-      "https://cdn.givingcompass.org/wp-content/uploads/2017/12/19171044/How-The-Tax-Bill-Rewrite-Could-Impact-Charitable-Giving.jpg";
+  final Charity charity;
+
   DetailPage(this.charity);
 
   @override
@@ -18,21 +19,21 @@ class DetailPage extends StatelessWidget {
         color: new Color(0xFF736AB7),
         child: new Stack(
           children: <Widget>[
-            getBackground(),
-            getGradient(),
-            getContent(),
-            getToolbar(context),
-            getButton(context),
+            _getBackground(),
+            _getGradient(),
+            _getContent(),
+            _getToolbar(context),
+            _getButton(context)
           ],
         ),
       ),
     );
   }
 
-  Container getBackground() {
+  Container _getBackground() {
     return new Container(
       child: new Image.network(
-        backImgURL,
+        charity.picture,
         fit: BoxFit.cover,
         height: 300.0,
       ),
@@ -40,7 +41,7 @@ class DetailPage extends StatelessWidget {
     );
   }
 
-  Container getGradient() {
+  Container _getGradient() {
     return new Container(
       margin: new EdgeInsets.only(top: 190.0),
       height: 110.0,
@@ -55,7 +56,7 @@ class DetailPage extends StatelessWidget {
     );
   }
 
-  Container getContent() {
+  Container _getContent() {
     final _overviewTitle = "Overview".toUpperCase();
     return new Container(
       child: new ListView(
@@ -75,7 +76,35 @@ class DetailPage extends StatelessWidget {
                   style: Style.headerTextStyle,
                 ),
                 new Separator(),
-                new Text(charity['description'], style: Style.commonTextStyle),
+                new Text(charity.description, style: Style.commonTextStyle),
+                new SizedBox(
+                  height: 15,
+                ),
+                new Text("ADDRESS", style: Style.headerTextStyle),
+                new Separator(),
+                new Text(
+                  charity.address,
+                  style: Style.commonTextStyle,
+                ),
+                new SizedBox(
+                  height: 15,
+                ),
+                new Row(
+                  children: [
+                    Icon(
+                      Icons.phone,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                    SizedBox(
+                      width: 10.0,
+                    ),
+                    Text(
+                      charity.phoneNo,
+                      style: Style.commonTextStyle,
+                    )
+                  ],
+                )
               ],
             ),
           ),
@@ -84,20 +113,27 @@ class DetailPage extends StatelessWidget {
     );
   }
 
-  Container getToolbar(BuildContext context) {
+  Container _getToolbar(BuildContext context) {
     return new Container(
       margin: new EdgeInsets.only(top: MediaQuery.of(context).padding.top),
       child: new BackButton(color: Colors.white),
     );
   }
 
-  Container getButton(BuildContext context) {
+  Container _getButton(BuildContext context) {
     return new Container(
       child: new Align(
         alignment: Alignment.bottomCenter,
         child: RaisedButton(
           onPressed: () {
-            Navigator.of(context).pushNamed('/donateForm');
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => DonateFormFragment(
+                        type: "Private",
+                        charityId: charity.id,
+                      )),
+            );
           },
           child: const Text('Donate Now', style: TextStyle(fontSize: 20)),
           color: Colors.white,
