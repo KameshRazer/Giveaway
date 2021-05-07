@@ -192,7 +192,7 @@ class DonateFormFragmentState extends State<DonateFormFragment> {
         backgroundColor: Colors.green,
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.only(left: 0.016.sw, right: 0.05.sw),
+        padding: EdgeInsets.only(left: 0.001.sw, right: 0.01.sw),
         child: Form(
           key: _formKey,
           child: new Column(
